@@ -20,3 +20,4 @@
 .sonar/
 .vscode/
 bin/
+*.pem
