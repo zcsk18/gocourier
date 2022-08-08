@@ -68,7 +68,7 @@ func (this *ClientServer) handleStoC(ctx context.Context, conn net.Conn, srv net
 		case <-ctx.Done():
 			return
 		default:
-			n, err := conn.Read(buf)
+			n, err := srv.Read(buf)
 			if err != nil {
 				return
 			}
@@ -99,6 +99,8 @@ func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, srv net
 			log.Println(err)
 			break
 		}
+
+		//log.Printf("send to proxy [%s] %d", srv.RemoteAddr().String(), len(msg))
 	}
 }
 

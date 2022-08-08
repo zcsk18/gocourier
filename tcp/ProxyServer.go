@@ -83,7 +83,7 @@ func (this *ProxyServer) handleCtoP(ctx context.Context, clt net.Conn, proxy net
 			log.Println(err)
 			break
 		}
-		//log.Printf("send proxy[%s] %d\n", proxy.RemoteAddr().String(),  n)
+		//log.Printf("send proxy[%s] %s\n", proxy.RemoteAddr().String(), msg)
 	}
 }
 

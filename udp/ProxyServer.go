@@ -19,8 +19,8 @@ type ProxyServer struct {
 }
 
 func CreateProxyServer() *ProxyServer {
-	salt := conf.GetIniValue("common", "salt")
-	password :=  conf.GetIniValue("common", "password")
+	salt := conf.GetIniValue("udp", "salt")
+	password :=  conf.GetIniValue("udp", "password")
 	port := conf.GetIniValue("srv", "port")
 
 	key := pbkdf2.Key([]byte(password), []byte(salt), 1024, 32, sha1.New)

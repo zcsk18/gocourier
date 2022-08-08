@@ -4,6 +4,7 @@ import (
 	"flag"
 	"godeliver/conf"
 	"godeliver/cryption"
+	"godeliver/tcp"
 	"godeliver/udp"
 )
 
@@ -18,13 +19,30 @@ func main() {
 	crypt.SetPublicKey("public.pem")
 	crypt.SetPrivateKey("private.pem")
 
-	if *strFlag == "srv" {
-		Srv := udp.CreateProxyServer()
-		Srv.Crypt = crypt
-		Srv.Run()
-	} else {
-		Clt := udp.CreateClientServer()
-		Clt.Crypt = crypt
-		Clt.Run()
+	proto := conf.GetIniValue("common", "protocol")
+
+	if proto == "tcp" {
+		if *strFlag == "srv" {
+			Srv := tcp.CreateProxyServer()
+			Srv.Crypt = crypt
+			Srv.Run()
+		} else {
+			Clt := tcp.CreateClientServer()
+			Clt.Crypt = crypt
+			Clt.Run()
+		}
+		return
+	}
+
+	if proto == "udp" {
+		if *strFlag == "srv" {
+			Srv := udp.CreateProxyServer()
+			Srv.Crypt = crypt
+			Srv.Run()
+		} else {
+			Clt := udp.CreateClientServer()
+			Clt.Crypt = crypt
+			Clt.Run()
+		}
 	}
 }

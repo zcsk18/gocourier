@@ -109,8 +109,8 @@ func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, sess *k
 }
 
 func (this * ClientServer) handShakeWithSrv() (*kcp.UDPSession, error) {
-	salt := conf.GetIniValue("common", "salt")
-	password :=  conf.GetIniValue("common", "password")
+	salt := conf.GetIniValue("udp", "salt")
+	password :=  conf.GetIniValue("udp", "password")
 
 	ip := conf.GetIniValue("srv", "ip")
 	port := conf.GetIniValue("srv", "port")
