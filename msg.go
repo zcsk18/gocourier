@@ -25,7 +25,7 @@ func echo(conn net.Conn, driver driver.CryptionDriver) {
 			panic(err)
 		}
 		msg = driver.Decode(msg)
-		log.Printf("recv[%s] %s %s\n", conn.RemoteAddr().String(), c, msg[len(msg)-5:])
+		//log.Printf("recv[%s] %s %s\n", conn.RemoteAddr().String(), c, msg[len(msg)-5:])
 		if c == "n" {
 			c = "r"
 		} else {
@@ -34,9 +34,11 @@ func echo(conn net.Conn, driver driver.CryptionDriver) {
 
 		v := strconv.Itoa(rand.Intn(10000))
 		msg = append(msg, []byte("-> hello: "+v)...)
+		start := time.Now()
 		msg = driver.Encode(msg)
 		tcp.Send(conn, c, msg)
-		log.Printf("send[%s] %d %s\n", conn.RemoteAddr().String(), len(msg), v)
+		end := time.Now()
+		log.Printf("send[%s] %d %s %d\n", conn.RemoteAddr().String(), len(msg), v, end.Sub(start).Microseconds())
 		time.Sleep(1000*time.Millisecond)
 	}
 }

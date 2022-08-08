@@ -11,7 +11,7 @@ var BufLen int
 var KeySize int
 
 func init() {
-	BufLen = 40960
+	BufLen = 4096
 	KeySize = 256
 }
 

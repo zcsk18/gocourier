@@ -69,17 +69,16 @@ func (this *ProxyServer) handleClt(clt net.Conn) {
 }
 
 func (this *ProxyServer) handleCtoP(ctx context.Context, clt net.Conn, proxy net.Conn) {
-	buf := make([]byte, conf.BufLen*2)
 	for {
 		clt.SetDeadline(time.Now().Add(30*time.Second))
-		n, err := clt.Read(buf)
+		_, msg, err := Recv(clt)
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		//log.Printf("recv clt[%s] %d\n", clt.RemoteAddr().String(), n)
-		msg := this.Crypt.Decode(buf[:n])
-		n, err = proxy.Write(msg)
+
+		msg = this.Crypt.Decode(msg)
+		_, err = proxy.Write(msg)
 		if err != nil {
 			log.Println(err)
 			break

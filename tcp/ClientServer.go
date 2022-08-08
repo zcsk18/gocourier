@@ -92,15 +92,13 @@ func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, srv net
 			log.Println(err)
 			break
 		}
-		//log.Printf("recv clt[%s] %d\n", conn.RemoteAddr().String(), n)
-		msg := this.Crypt.Encode(buf[:n])
 
-		_, err = srv.Write(msg)
+		msg := this.Crypt.Encode(buf[:n])
+		_, err = Send(srv, "p", msg)
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		//log.Printf("send srv[%s] %d\n", srv.RemoteAddr().String(), n)
 	}
 }
 
