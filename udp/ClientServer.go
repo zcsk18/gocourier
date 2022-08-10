@@ -88,7 +88,7 @@ func (this *ClientServer) handleStoC(ctx context.Context, conn net.Conn, sess *k
 }
 
 func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, sess *kcp.UDPSession) {
-	buf := make([]byte, conf.BufLen)
+	buf := make([]byte, 512)
 	for {
 		conn.SetDeadline(time.Now().Add(60*time.Second))
 
