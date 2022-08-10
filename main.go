@@ -8,7 +8,8 @@ import (
 	"godeliver/server"
 )
 
-var strFlag = flag.String("s", "", "-s [srv|clt]")
+var sFlag = flag.String("s", "", "-s [srv|clt]")
+var sFile = flag.String("f", "", "-s [srv|clt]")
 
 func CreateServer(proto string, flag string, crypt driver.CryptionDriver) driver.ServerDriver {
 	if proto == "tcp" {
@@ -20,10 +21,10 @@ func CreateServer(proto string, flag string, crypt driver.CryptionDriver) driver
 
 func main() {
 	flag.Parse()
-	conf.SetIni("cfg.ini")
+	conf.SetIni(*sFile)
 	proto := conf.GetIniValue("common", "protocol")
 	crypt := conf.GetIniValue("common", "crypt")
 
-	srv := CreateServer(proto, *strFlag, cryption.CreateCryption(crypt))
+	srv := CreateServer(proto, *sFlag, cryption.CreateCryption(crypt))
 	srv.Run()
 }
