@@ -4,6 +4,7 @@ import (
 	"context"
 	"godeliver/conf"
 	"godeliver/driver"
+	"godeliver/misc"
 	"log"
 	"net"
 	"time"
@@ -94,7 +95,7 @@ func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, srv net
 		}
 
 		msg := this.Crypt.Encode(buf[:n])
-		_, err = Send(srv, "p", msg)
+		_, err = misc.Send(srv, "p", msg)
 		if err != nil {
 			log.Println(err)
 			break

@@ -1,12 +1,10 @@
-package tcp
+package misc
 
 import (
-	"godeliver/misc"
 	"io"
-	"net"
 )
 
-func Recv(conn net.Conn) (string, []byte, error) {
+func Recv(conn io.Reader) (string, []byte, error) {
 	c := make([]byte, 1)
 	_,err := conn.Read(c)
 	if err != nil {
@@ -18,9 +16,8 @@ func Recv(conn net.Conn) (string, []byte, error) {
 	if err != nil {
 		return "", nil, err
 	}
-	n := misc.BytesToInt(l)
+	n := BytesToInt(l)
 	msg := make([]byte, n)
-
 
 	amount, err := io.ReadAtLeast(conn, msg, n)
 	if err != nil{
@@ -33,7 +30,7 @@ func Recv(conn net.Conn) (string, []byte, error) {
 	return string(c), msg, nil
 }
 
-func Send(conn net.Conn, c string, msg []byte) (int, error) {
+func Send(conn io.Writer, c string, msg []byte) (int, error) {
 	if len(c) != 1 {
 		panic("contral len not eq 1")
 	}
@@ -43,7 +40,7 @@ func Send(conn net.Conn, c string, msg []byte) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	_, err =conn.Write(misc.IntToBytes(n))
+	_, err =conn.Write(IntToBytes(n))
 	if err != nil {
 		return 0, err
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"godeliver/conf"
 	"godeliver/driver"
+	"godeliver/misc"
 	"log"
 	"net"
 	"time"
@@ -71,7 +72,7 @@ func (this *ProxyServer) handleClt(clt net.Conn) {
 func (this *ProxyServer) handleCtoP(ctx context.Context, clt net.Conn, proxy net.Conn) {
 	for {
 		clt.SetDeadline(time.Now().Add(30*time.Second))
-		_, msg, err := Recv(clt)
+		_, msg, err := misc.Recv(clt)
 		if err != nil {
 			log.Println(err)
 			break

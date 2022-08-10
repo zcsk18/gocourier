@@ -6,6 +6,7 @@ import (
 	"github.com/xtaci/kcp-go/v5"
 	"godeliver/conf"
 	"godeliver/driver"
+	"godeliver/misc"
 	"golang.org/x/crypto/pbkdf2"
 	"io"
 	"log"
@@ -87,7 +88,7 @@ func (this *ClientServer) handleStoC(ctx context.Context, conn net.Conn, sess *k
 }
 
 func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, sess *kcp.UDPSession) {
-	buf := make([]byte, (256-11)*2)
+	buf := make([]byte, conf.BufLen)
 	for {
 		conn.SetDeadline(time.Now().Add(60*time.Second))
 
@@ -96,15 +97,13 @@ func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, sess *k
 			log.Println(err)
 			break
 		}
-		//log.Printf("recv clt[%s] %d\n", conn.RemoteAddr().String(), n)
-		msg := this.Crypt.Encode(buf[:n])
 
-		_, err = sess.Write(msg)
+		msg := this.Crypt.Encode(buf[:n])
+		_, err = misc.Send(sess, "p", msg)
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		//log.Printf("send srv[%s] %d\n", sess.RemoteAddr().String(), n)
 	}
 }
 

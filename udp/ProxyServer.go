@@ -6,8 +6,8 @@ import (
 	"github.com/xtaci/kcp-go/v5"
 	"godeliver/conf"
 	"godeliver/driver"
+	"godeliver/misc"
 	"golang.org/x/crypto/pbkdf2"
-	"io"
 	"log"
 	"net"
 	"time"
@@ -75,23 +75,22 @@ func (this *ProxyServer) handleClt(session *kcp.UDPSession) {
 	cancel()
 }
 
-func (this *ProxyServer) handleCtoP(ctx context.Context, session *kcp.UDPSession, proxy net.Conn) {
-	buf := make([]byte, conf.BufLen*2)
+func (this *ProxyServer) handleCtoP(ctx context.Context, clt *kcp.UDPSession, proxy net.Conn) {
 	for {
-		session.SetDeadline(time.Now().Add(30*time.Second))
-		n, err := io.ReadAtLeast(session, buf, 1)
+		clt.SetDeadline(time.Now().Add(30*time.Second))
+		_, msg, err := misc.Recv(clt)
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		//log.Printf("recv clt[%s] %d\n", session.RemoteAddr().String(), n)
-		msg := this.Crypt.Decode(buf[:n])
-		n, err = proxy.Write(msg)
+
+		msg = this.Crypt.Decode(msg)
+		_, err = proxy.Write(msg)
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		//log.Printf("send proxy[%s] %d\n", proxy.RemoteAddr().String(),  n)
+		//log.Printf("send proxy[%s] %s\n", proxy.RemoteAddr().String(), msg)
 	}
 }
 
