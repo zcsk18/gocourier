@@ -1,4 +1,4 @@
-package tcp
+package server
 
 import (
 	"context"
@@ -10,12 +10,11 @@ import (
 	"time"
 )
 
-type ProxyServer struct {
-	Listener net.Listener
-	Crypt    driver.CryptionDriver
+type TcpProxyServer struct {
+	*driver.ProxyServer
 }
 
-func CreateProxyServer() *ProxyServer {
+func CreateTcpProxyServer() *TcpProxyServer {
 	port := conf.GetIniValue("srv", "port")
 
 	listen, err := net.Listen("tcp", "0.0.0.0:"+port)
@@ -27,12 +26,13 @@ func CreateProxyServer() *ProxyServer {
 	}
 
 	log.Printf("start proxy on: %s", port)
-	srv := &ProxyServer{}
+	srv := &TcpProxyServer{}
+	srv.ProxyServer = &driver.ProxyServer{}
 	srv.Listener = listen
 	return srv
 }
 
-func (this *ProxyServer) Run() {
+func (this *TcpProxyServer) Run() {
 	for {
 		s, err := this.Listener.Accept()
 		if err != nil {
@@ -42,7 +42,7 @@ func (this *ProxyServer) Run() {
 	}
 }
 
-func (this *ProxyServer) handleClt(clt net.Conn) {
+func (this *TcpProxyServer) handleClt(clt net.Conn) {
 	defer func() {
 		clt.Close()
 		log.Printf("clt disconnect %s\n", clt.RemoteAddr().String())
@@ -64,12 +64,12 @@ func (this *ProxyServer) handleClt(clt net.Conn) {
 
 
 	ctx, cancel := context.WithCancel(context.Background())
-	go this.handlePtoC(ctx, clt, proxy)
+	go this.HandlePtoC(ctx, clt, proxy)
 	this.handleCtoP(ctx, clt, proxy)
 	cancel()
 }
 
-func (this *ProxyServer) handleCtoP(ctx context.Context, clt net.Conn, proxy net.Conn) {
+func (this *TcpProxyServer) handleCtoP(ctx context.Context, clt net.Conn, proxy net.Conn) {
 	for {
 		clt.SetDeadline(time.Now().Add(30*time.Second))
 		_, msg, err := misc.Recv(clt)
@@ -85,26 +85,5 @@ func (this *ProxyServer) handleCtoP(ctx context.Context, clt net.Conn, proxy net
 			break
 		}
 		//log.Printf("send proxy[%s] %s\n", proxy.RemoteAddr().String(), msg)
-	}
-}
-
-func (this *ProxyServer) handlePtoC(ctx context.Context, clt net.Conn, proxy net.Conn) {
-	buf := make([]byte, conf.BufLen)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			n, err := proxy.Read(buf)
-			if err != nil {
-				return
-			}
-			//log.Printf("recv proxy[%s] %d\n", proxy.RemoteAddr().String(), n)
-			n, err = clt.Write(buf[:n])
-			if err != nil {
-				return
-			}
-			//log.Printf("send clt[%s] %d\n",clt.RemoteAddr().String(), n)
-		}
 	}
 }
