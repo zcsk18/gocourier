@@ -14,6 +14,7 @@ import (
 
 type UdpProxyServer struct {
 	*driver.ProxyServer
+	Listener *kcp.Listener
 }
 
 func CreateUdpProxyServer() *UdpProxyServer {
@@ -38,11 +39,12 @@ func CreateUdpProxyServer() *UdpProxyServer {
 
 func (this *UdpProxyServer) Run() {
 	for {
-		s, err := this.Listener.Accept()
+		clt, err := this.Listener.AcceptKCP()
 		if err != nil {
 			log.Fatal(err)
 		}
-		go this.handleClt(s)
+		clt.SetNoDelay(1,20,2,1)
+		go this.handleClt(clt)
 	}
 }
 
