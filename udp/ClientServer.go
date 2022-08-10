@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -89,6 +90,7 @@ func (this *ClientServer) handleStoC(ctx context.Context, conn net.Conn, sess *k
 
 func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, sess *kcp.UDPSession) {
 	buf := make([]byte, 512)
+	first := true
 	for {
 		conn.SetDeadline(time.Now().Add(60*time.Second))
 
@@ -96,6 +98,17 @@ func (this *ClientServer) handleCtoS(ctx context.Context, conn net.Conn, sess *k
 		if err != nil {
 			log.Println(err)
 			break
+		}
+
+		if first {
+			first = false
+			str := string(buf)
+			if strings.Contains(str, "CONNECT") ||
+				strings.Contains(str, "GET") ||
+				strings.Contains(str, "POST") ||
+				strings.Contains(str, "HEAD") {
+				misc.AnalysisHttp(str)
+			}
 		}
 
 		msg := this.Crypt.Encode(buf[:n])
