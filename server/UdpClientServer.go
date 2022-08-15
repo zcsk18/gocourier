@@ -75,7 +75,7 @@ func (this *UdpClientServer) handShakeWithSrv() (*kcp.UDPSession, error) {
 
 	srv, err := kcp.DialWithOptions(ip+":"+port, block, 10, 3)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	log.Printf("proxy connect : %s\n", srv.RemoteAddr().String())
 
