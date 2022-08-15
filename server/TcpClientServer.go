@@ -66,7 +66,7 @@ func (this *TcpClientServer) handShakeWithSrv() (net.Conn, error) {
 
 	srv, err := net.Dial("tcp", ip+":"+port)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	log.Printf("proxy connect : %s\n", srv.RemoteAddr().String())
 
